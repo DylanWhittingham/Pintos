@@ -211,9 +211,9 @@ struct Elf32_Phdr
 #define PF_W 2          /* Writable. */
 #define PF_R 4          /* Readable. */
 
-static bool setup_stack (void **esp, char **argv, int argc);
+static bool setup_stack (void **esp, char **argv, int argc);  //sets the stack to load argv, argc ontop of the user stack
 static bool validate_segment (const struct Elf32_Phdr *, struct file *);
-static bool load_segment (struct file *file, off_t ofs, uint8_t *upage,
+static bool load_segment (struct file *file, off_t ofs, uint8_t *upage,  //initializes structs and vars for use 
                           uint32_t read_bytes, uint32_t zero_bytes,
                           bool writable);
 
@@ -458,7 +458,7 @@ load_segment (struct file *file, off_t ofs, uint8_t *upage,
 /* Create a minimal stack by mapping a zeroed page at the top of
    user virtual memory. */
 //static bool
-static bool setup_stack (void **esp, char **argv, int argc)
+static bool setup_stack (void **esp, char **argv, int argc)  //sets the stack to load argv, argc ontop of the user stack
 {
   uint8_t *kpage;
   bool success = false;
