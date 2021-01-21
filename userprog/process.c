@@ -29,6 +29,8 @@ tid_t
 process_execute (const char *file_name) 
 {
   char *fn_copy;
+  char *real_fn;
+  char *save_ptr;
   tid_t tid;
 
   /* Make a copy of FILE_NAME.
@@ -36,10 +38,13 @@ process_execute (const char *file_name)
   fn_copy = palloc_get_page (0);
   if (fn_copy == NULL)
     return TID_ERROR;
-  strlcpy (fn_copy, file_name, PGSIZE);
+  strlcpy (fn_copy, file_name, 200);
+  	
+  real_fn = strtok_r (fn_copy, " ", &save_ptr);
+  printf ("real file name = %s\n", real_fn);
 
   /* Create a new thread to execute FILE_NAME. */
-  tid = thread_create (file_name, PRI_DEFAULT, start_process, fn_copy);
+  tid = thread_create (real_fn, PRI_DEFAULT, start_process, fn_copy);
 
   if (tid == TID_ERROR)
     palloc_free_page (fn_copy); 
@@ -102,7 +107,8 @@ process_exit (void)
 {
   struct thread *cur = thread_current ();
   uint32_t *pd;
-  printf("%s: exit(%d)\n", cur->name, cur->exitCode); //prints process name and exitCode
+  printf("%s: exit(%d)\n", cur->name, cur->exitCode); /*prints process name and exitCode, 
+			these two vars are retrieved by accessing the thread struct, where %s represents the string name, and %d represents the integer exitCode */
 
   /* Destroy the current process's page directory and switch back
      to the kernel-only page directory. */
@@ -444,7 +450,7 @@ setup_stack (void **esp)
     {
       success = install_page (((uint8_t *) PHYS_BASE) - PGSIZE, kpage, true);
       if (success) {
-        *esp = PHYS_BASE - 12;
+        *esp = PHYS_BASE - 12; //Decrements *esp by PHYS_BASE-12, we do this to stop test programs that don't examine arguments crashing
       } else
         palloc_free_page (kpage);
     }
